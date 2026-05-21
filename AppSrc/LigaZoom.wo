@@ -7,8 +7,13 @@ Use cWebPanel.pkg
 Use cWebMenuGroup.pkg
 Use cWebMenuItem.pkg
 Use cWebForm.pkg
+Use cWebButton.pkg
+Use cWebList.pkg
+Use cWebColumn.pkg
+Use cWebColumnButton.pkg
 
 Use cligaDataDictionary.dd
+Use cequipoDataDictionary.dd
 
 Object oLigaZoom is a cWebView
     Set piColumnCount to 12
@@ -21,6 +26,10 @@ Object oLigaZoom is a cWebView
 
     Object oliga_DD is a cligaDataDictionary
     End_Object 
+
+    Object oequipo_DD is a cequipoDataDictionary
+        Set DDO_Server To oliga_DD
+    End_Object
 
     Set Main_DD To oliga_DD
     Set Server  To oliga_DD
@@ -69,6 +78,64 @@ Object oLigaZoom is a cWebView
             Set peLabelPosition to lpTop
             Set psLabel to "EquiposMax"
         End_Object 
+
+        Object oVerEquiposBtn is a cWebButton
+            Set Server to oliga_DD
+            Set piColumnSpan to 4
+            Set piColumnIndex to 0
+            Set psCaption to "Ver equipos de esta liga"
+
+            WebRegisterPath ntNavigateForward oEquipoSelect
+
+            Procedure OnClick
+                Send NavigatePath
+            End_Procedure
+        End_Object
+
+        Object oEquiposList is a cWebList
+            Set Server to oequipo_DD
+            Set piColumnSpan to 0
+            Set pbServerOnRowClick to True
+            Set pbShowHeader to True
+            Set piHeight to 220
+            Set psCSSClass to "MobileList"
+
+            Object oequipoID is a cWebColumn
+                Entry_Item equipo.ID
+                Set psCaption to "ID"
+                Set piWidth to 80
+            End_Object
+
+            Object oequipoNombre is a cWebColumn
+                Entry_Item equipo.Nombre
+                Set psCaption to "Equipo"
+                Set piWidth to 320
+            End_Object
+
+            Object oEquipoDetalleBtn is a cWebColumnButton
+                Set psCaption to "btn"
+                Set piWidth to 45
+                Set pbFixedWidth to True
+                Set pbResizable to False
+                Set piListRowSpan to 1
+                Set psBtnCssClass to "WebButtonIcon WebIcon_Info"
+                Set peAlign to alignRight
+
+                WebRegisterPath ntNavigateForward oEquipoZoom
+
+                Procedure OnClick
+                    Send NavigatePath
+                End_Procedure
+
+                Procedure OnGetNavigateForwardData tWebNavigateData ByRef NavigateData Handle hoToView
+                    Move True to NavigateData.bReadOnly
+                End_Procedure
+            End_Object
+
+            Procedure OnRowClick String sRowId
+                Send NavigateForward of oEquipoZoom Self
+            End_Procedure
+        End_Object
     End_Object 
 
     Object oActionGroup is a cWebMenuGroup
@@ -169,6 +236,7 @@ Object oLigaZoom is a cWebView
         Case End
 
         Send SetActionButtons
+        Send GridRefresh of oEquiposList
 
     End_Procedure
 
